@@ -11,17 +11,21 @@ compLinAutoEncoder.py: Compressive linear auto-encoder for 8x8 image patches
 # import modules
 import os
 import numpy as np
+import time
 import tensorflow as tf
 from scipy.io import loadmat 
+import pltWts as pw
+
 
 # simulation meta-parameters
-wscale      = 0.01; # scale of the small random weights for model initialization
-learn_rate  = 0.1;
-batchSz     = 1000;
-nEpochs     = 1000;
+wscale      = 0.01;  # scale of the small random weights for model initialization
+learn_rate  = 2;
+batchSz     = 4000;
+nEpochs     = 10000;
 fracTrain   = 0.8;
 
-beta        = 0.5; # hyper-parameter which determines penality size 
+beta        = 2;  # hyper-parameter which determines penality size 
+gamma       = 0.0;  
 
 # define list of training data filenames 
 trainDir            = 'TrainingData'
@@ -46,7 +50,7 @@ nStim   = tdata.shape[0]
 nTrain  = round(fracTrain*nStim)
 
 # we compress the images by a factor of 4
-nHid  = nIn   
+nHid  = round(nIn)   
 
 print("Training Set Size   : " + str(nTrain))
 print("Stimulus Dimensions : " + str(nIn))
@@ -59,6 +63,7 @@ hidden layer which compresses the input image down to nHid dimensions
 """
 
 W1mat               = tf.random_normal([nIn,nHid], mean=0.0, stddev=wscale, dtype=tf.float32, name = 'W1mat')
+# W1mat = tf.eye(nIn,num_columns = None, batch_shape = None ,dtype=tf.float32, name ='W1mat')
 
 # define tf variables and initial values for hidden layer, output layer
 hidden_layer_vals   = {'weights':tf.Variable(W1mat)}
@@ -73,8 +78,10 @@ y_true              = tf.placeholder('float',[None, nIn])
 # define our cost function
 meansq              = tf.reduce_mean(tf.square(y_pred-y_true)) 
 hiddenpenalty       = tf.reduce_mean(tf.abs(hidden_layer))
+# weightpenalty       = tf.reduce_mean(tf.square(hidden_layer_vals['weights']))
 
-penalizedmeansq     = meansq + beta*hiddenpenalty
+
+penalizedmeansq     = meansq + beta*hiddenpenalty #+ gamma*weightpenalty
 
 # define which optimizer we are using
 optimizer           = tf.train.AdagradOptimizer(learn_rate).minimize(penalizedmeansq)
@@ -90,13 +97,23 @@ sess.run(init)
 ## go through the set
 for epoch in range(nEpochs):
     epoch_loss = 0
+    epoch_hidden_loss = 0
+    epoch_meansq = 0
     for i in range(int(nTrain/batchSz)):
         epoch_x = tdata[i*batchSz:(i+1)*batchSz]
-        _, c    = sess.run([optimizer,penalizedmeansq], feed_dict={input_layer: epoch_x, y_true: epoch_x}) 
+        [_, c, d, e]    = sess.run([optimizer,penalizedmeansq, hiddenpenalty, meansq], feed_dict={input_layer: epoch_x, y_true: epoch_x}) 
         epoch_loss +=c
-   
-    print('Epoch',epoch + 1, '/', nEpochs, '-- loss:',epoch_loss)
+        epoch_hidden_loss +=d
+        epoch_meansq +=e
     
+    print('Epoch',epoch + 1, '/', nEpochs, '-- loss:',epoch_loss,'-- msq :',epoch_meansq , '-- sparsity:',epoch_hidden_loss)
+#    if(np.fmod(epoch + 1,1000)==0):
+#        save_path = saver.save(sess,"./sparseLinTrainFinal.ckpt")
+#        print('saving data!')
+#        time.sleep(0.5)
+
+
 
 save_path = saver.save(sess,"./sparseLinTrainFinal.ckpt")
 
+sess.close()
