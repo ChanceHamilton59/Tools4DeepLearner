@@ -12,13 +12,13 @@ import tensorflow as tf
 import matplotlib.pyplot as plt 
 import numpy as np
 
-fName           = "./AutoEncoderSparseLinFinal.ckpt"
+fName           = "./AutoEncoderSparseSigFinal.ckpt"
 
 sess            = tf.Session()
 saver           = tf.train.Saver()
 saver.restore(sess,fName)
    
-X               = final_W
+X               = final_W1
 
 nHid            = X.shape[1]            # get the number of hidden units
 imSz            = int(np.sqrt(X.shape[0]))   # size of each image patch
