@@ -268,6 +268,45 @@ def trainNetwork(data_type, patch_size, num_patches,save_nets, verbose):
                                     
                                     # Close session
                                     sess.close()
+                                    
+                                    
+                                    Z = final_W1
+                                    nHid            = Z.shape[1]            # get the number of hidden units
+                                    imSz            = int(np.sqrt(Z.shape[0]))   # size of each image patch
+                                    plotGap2        = 1                     # half the gap to leave between each image patch
+                                    imSzPlot        = int(imSz + 2*plotGap2)    
+
+                                    layoutSqDim     = int(np.ceil(np.sqrt(nHid)))  # find dimensions for layout
+                                    W1_plots      = np.zeros((layoutSqDim*imSzPlot,layoutSqDim*imSzPlot))
+                                    
+                                    k = 0
+                                    for i in range(layoutSqDim):
+                                        for j in range(layoutSqDim):
+                                            if k < nHid:    
+                                                littleImPlot = np.zeros((imSzPlot,imSzPlot))
+                                                littleImPlot[(plotGap2):(imSzPlot-plotGap2),(plotGap2):(imSzPlot-plotGap2)] = np.reshape(Z[:,k],(imSz,imSz)) 
+                                                W1_plots[ (i*imSzPlot ):((i+1)*imSzPlot) , (j*imSzPlot ):((j+1)*imSzPlot) ] = littleImPlot;
+                                                k = k + 1
+                                                
+                                    Z = final_W2
+                                    nHid            = Z.shape[1]            # get the number of hidden units
+                                    imSz            = int(np.sqrt(Z.shape[0]))   # size of each image patch
+                                    plotGap2        = 1                     # half the gap to leave between each image patch
+                                    imSzPlot        = int(imSz + 2*plotGap2)    
+
+                                    layoutSqDim     = int(np.ceil(np.sqrt(nHid)))  # find dimensions for layout
+                                    W2_plots      = np.zeros((layoutSqDim*imSzPlot,layoutSqDim*imSzPlot))
+                                    
+                                    k = 0
+                                    for i in range(layoutSqDim):
+                                        for j in range(layoutSqDim):
+                                            if k < nHid:    
+                                                littleImPlot = np.zeros((imSzPlot,imSzPlot))
+                                                littleImPlot[(plotGap2):(imSzPlot-plotGap2),(plotGap2):(imSzPlot-plotGap2)] = np.reshape(Z[:,k],(imSz,imSz)) 
+                                                W2_plots[ (i*imSzPlot ):((i+1)*imSzPlot) , (j*imSzPlot ):((j+1)*imSzPlot) ] = littleImPlot;
+                                                k = k + 1
+                                                
+                                                
         
                                     # Make PDF plots - still in scope of inner loop. Modify Chance's code here. 
                                     
