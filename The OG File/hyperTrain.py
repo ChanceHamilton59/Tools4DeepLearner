@@ -285,8 +285,17 @@ def trainNetwork(data_type, patch_size, num_patches,save_nets, verbose):
                                                 bat_size_vec[i_bat], sparse_penalty_vec[i_spr], w2norm_penalty_vec[i_w2n], l, e, s) 
                                                 
                                     fig.suptitle(txt,x = 0.1, y= .65, fontsize=14, fontweight='bold', ha = 'left')
-                                    fig.add_subplot(1,4,1).axis('off')
+                                    fig.add_subplot(1,3,1).axis('off')
+                                    fig.add_subplot(1,3,2)
+                                    plt.title('Final_W1 Plots')
+                                    plt.imshow(final_W1, cmap="gray")
+                                    fig.add_subplot(1,3,3)
+                                    plt.title('Final_W2 Plots')
+                                    plt.imshow(final_W2, cmap="gray")
                                     pdf.savefig(fig)
+                                    
+                                    
+                                    
                                     model_num += 1
         
         
