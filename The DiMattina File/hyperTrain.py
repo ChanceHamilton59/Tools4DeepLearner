@@ -28,8 +28,8 @@ from matplotlib.backends.backend_pdf import PdfPages
 ###############################################################################
 # Set hyper-parameter values (variables to loop through)
 ###############################################################################
-wscale_vec          = [0.01, 0.1]                
-learning_rate_vec   = [0.01, 0.1, 1]   
+wscale_vec          = [0.01]                
+learning_rate_vec   = [0.01]   
 bat_size_vec        = [1000]    # [1000]             
 nhidden_vec         = [50]      # [25, 50, 100, 200]
 sparse_penalty_vec  = [0.1]     # [0, 0.01, 0.1, 1, 10]
@@ -288,7 +288,9 @@ def trainNetwork(data_type, patch_size, num_patches,save_nets, verbose):
                                                 W1_plots[ (i*imSzPlot ):((i+1)*imSzPlot) , (j*imSzPlot ):((j+1)*imSzPlot) ] = littleImPlot;
                                                 k = k + 1
                                                 
-                                    Z = final_W2
+                                                
+                                                
+                                    Z = np.transpose(final_W2)
                                     nHid            = Z.shape[1]            # get the number of hidden units
                                     imSz            = int(np.sqrt(Z.shape[0]))   # size of each image patch
                                     plotGap2        = 1                     # half the gap to leave between each image patch
@@ -305,12 +307,13 @@ def trainNetwork(data_type, patch_size, num_patches,save_nets, verbose):
                                                 littleImPlot[(plotGap2):(imSzPlot-plotGap2),(plotGap2):(imSzPlot-plotGap2)] = np.reshape(Z[:,k],(imSz,imSz)) 
                                                 W2_plots[ (i*imSzPlot ):((i+1)*imSzPlot) , (j*imSzPlot ):((j+1)*imSzPlot) ] = littleImPlot;
                                                 k = k + 1
+
                                                 
                                                 
         
                                     # Make PDF plots - still in scope of inner loop. Modify Chance's code here. 
                                     
-                                    fig = plt.figure(figsize=(15, 7))
+                                    fig = plt.figure(figsize=(35, 7))
                                     txt = "Trained model : %d \n \
                                             num_hidden : %d \n \
                                             wscale : %f \n \
@@ -327,10 +330,10 @@ def trainNetwork(data_type, patch_size, num_patches,save_nets, verbose):
                                     fig.add_subplot(1,3,1).axis('off')
                                     fig.add_subplot(1,3,2)
                                     plt.title('Final_W1 Plots')
-                                    plt.imshow(final_W1, cmap="gray")
+                                    plt.imshow(W1_plots, cmap="gray")
                                     fig.add_subplot(1,3,3)
                                     plt.title('Final_W2 Plots')
-                                    plt.imshow(final_W2, cmap="gray")
+                                    plt.imshow(W2_plots, cmap="gray")
                                     pdf.savefig(fig)
                                     
                                     
